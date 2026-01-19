@@ -2,6 +2,49 @@
 
 A robust, production-ready Playwright automation framework demonstrating test orchestration, visual evidence collection, and custom data persistence for long-term quality analytics.
 
+## Dashboard Preview
+
+The framework includes a custom-built **Infinity Analytics Dashboard** - a dark-themed, interactive HTML report that provides comprehensive insights into your test executions.
+
+### Analytics Overview
+![Analytics Dashboard](docs/images/dashboard-analytics.png)
+
+The main analytics view displays key metrics at a glance:
+- **Stability Index** - Overall pass rate across all test runs
+- **Execution Time** - Average test duration tracking
+- **Performance Comparison** - Side-by-side parallel vs sequential execution metrics with 4x speedup visualization
+- **Interactive Charts** - Run time trends (cyan for parallel, orange for sequential) and pass/fail distribution
+- **Browser Performance** - Per-browser stability tracking with progress indicators
+
+### Execution Runs
+![Execution Runs](docs/images/dashboard-runs.png)
+
+The run history view provides:
+- **Grouped Test Runs** - Each execution grouped by timestamp with unique Run ID
+- **Execution Mode Badges** - Visual indicators for parallel or sequential runs
+- **Quick Stats** - Pass/fail counts and total duration at a glance
+- **Click to Inspect** - Navigate to detailed evidence for any run
+
+### Test Evidence Hub - Passing Tests
+![Test Evidence - Passing](docs/images/dashboard-evidence-pass.png)
+
+The evidence viewer for passing tests shows:
+- **Test List Panel** - All tests with status indicators and execution time
+- **Step-by-Step Timeline** - Each test step with duration breakdown
+- **Live Screenshots** - Visual evidence captured at every step
+- **Filter Controls** - Quick filters for All/Passed/Failed tests
+
+### Test Evidence Hub - Failed Tests
+![Test Evidence - Failed](docs/images/dashboard-evidence-fail.png)
+
+For failed tests, the dashboard provides:
+- **Error Details Panel** - Full error message with stack trace
+- **Screenshot at Failure Point** - Visual state when the test failed
+- **Expected vs Received** - Clear diff showing assertion mismatches
+- **File Location** - Direct links to failing test file and line number
+
+---
+
 ## Features
 
 - **TypeScript** with strict type checking
