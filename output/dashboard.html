@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity QA 4.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --bg-surface: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #818cf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #c084fc;
+            --glass: rgba(15, 23, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--primary) transparent; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 80px; background: var(--bg-surface);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 30px 0; border-right: 1px solid var(--border);
+            z-index: 100; flex-shrink: 0;
+        }
+        .nav-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px; cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted); font-size: 1.2rem;
+        }
+        .nav-icon:hover { color: white; background: var(--bg-card); }
+        .nav-icon.active { color: white; background: var(--primary); box-shadow: 0 0 20px rgba(129, 140, 248, 0.4); }
+
+        main { flex-grow: 1; overflow-y: auto; padding: 40px; position: relative; background: radial-gradient(circle at top right, #1e1b4b, transparent 40%); }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-size: 2.2rem; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1px; }
+        h2 { font-size: 1.4rem; font-weight: 700; margin: 30px 0 20px 0; color: var(--text-main); }
+        .subtitle { color: var(--text-muted); margin-bottom: 40px; font-weight: 400; font-size: 0.95rem; }
+
+        /* Dashboard Components */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+        .stat-val { font-size: 2rem; font-weight: 800; }
+
+        /* Browser Table */
+        .browser-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .browser-table th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        .browser-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .browser-table tr:hover { background: rgba(255,255,255,0.02); }
+        .browser-icon { width: 24px; height: 24px; margin-right: 10px; vertical-align: middle; }
+        .stability-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .stability-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+        /* Category Pills */
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+        .category-pill { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .category-name { font-weight: 600; font-size: 0.9rem; }
+        .category-stats { text-align: right; }
+        .category-count { font-size: 1.2rem; font-weight: 700; }
+
+        /* Flaky Tests Warning */
+        .flaky-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 16px; margin-top: 20px; }
+        .flaky-title { color: var(--warning); font-weight: 700; margin-bottom: 10px; }
+        .flaky-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* Metrics Comparison Grid */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+        .metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+        .metric-card.parallel { border-left: 3px solid #06b6d4; }
+        .metric-card.sequential { border-left: 3px solid #f59e0b; }
+        .metric-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+        .metric-value { font-size: 1.4rem; font-weight: 700; }
+        .metric-compare { font-size: 0.75rem; margin-top: 6px; }
+        .metric-compare.better { color: var(--success); }
+        .metric-compare.worse { color: var(--danger); }
+
+        /* Run History (Audit Logs) */
+        .run-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+        .run-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 20px; cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .run-card:hover { border-color: var(--primary); transform: scale(1.02); }
+        .run-id { font-family: 'JetBrains Mono'; color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; }
+        .run-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 0.85rem; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+        .badge-p { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-f { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-parallel { background: rgba(6, 182, 212, 0.15); color: #06b6d4; }
+        .badge-sequential { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .browser-badges { display: flex; gap: 6px; margin-top: 10px; }
+        .browser-badge { font-size: 1rem; opacity: 0.7; }
+
+        /* Search and Filter */
+        .search-bar { display: flex; gap: 12px; margin-bottom: 24px; }
+        .search-input { flex: 1; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.9rem; }
+        .search-input:focus { outline: none; border-color: var(--primary); }
+        .filter-btn { padding: 12px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .filter-btn:hover { border-color: var(--primary); color: var(--text-main); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Test Lab Overhaul */
+        .suite-container { display: grid; grid-template-columns: 360px 1fr; gap: 24px; height: calc(100vh - 280px); }
+        .tc-list { overflow-y: auto; padding-right: 8px; }
+        .tc-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+        }
+        .tc-card:hover { border-color: var(--primary); }
+        .tc-card.active { border-color: var(--primary); background: rgba(129, 140, 248, 0.1); }
+        .tc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .tc-title { font-size: 0.9rem; font-weight: 600; }
+        .tc-status-icon { width: 10px; height: 10px; border-radius: 50%; }
+        .tc-status-icon.passed { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .tc-status-icon.failed { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .tc-meta { display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-muted); }
+        .tc-browser { display: flex; align-items: center; gap: 4px; }
+        .tc-category { padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); }
+
+        .details-pane { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+        .pane-header { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .pane-title { font-size: 1.1rem; font-weight: 700; }
+        .pane-meta { display: flex; gap: 20px; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+        .pane-content { flex-grow: 1; display: grid; grid-template-columns: 380px 1fr; overflow: hidden; }
+
+        .timeline { border-right: 1px solid var(--border); overflow-y: auto; padding: 20px; background: rgba(0,0,0,0.1); }
+        .step-item { padding: 14px; border-radius: 10px; cursor: pointer; margin-bottom: 12px; border: 1px solid transparent; position: relative; }
+        .step-item.active { border-color: var(--primary); background: rgba(129, 140, 248, 0.05); }
+        .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .step-number { color: var(--primary); font-family: 'JetBrains Mono'; font-size: 0.7rem; }
+        .step-status { width: 8px; height: 8px; border-radius: 50%; }
+        .step-status.passed { background: var(--success); }
+        .step-status.failed { background: var(--danger); }
+        .step-name { font-weight: 600; font-size: 0.85rem; flex: 1; }
+        .step-duration { font-size: 0.7rem; color: var(--text-muted); }
+        .step-details { font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; }
+
+        .viewer { display: flex; flex-direction: column; background: #000; overflow: hidden; position: relative; }
+        .viewer-main { flex-grow: 1; overflow: auto; padding: 20px; text-align: center; }
+        .viewer-img { max-width: 100%; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.2s; }
+        .viewer-footer { padding: 12px 20px; background: var(--bg-card); display: flex; justify-content: space-between; font-size: 0.75rem; border-top: 1px solid var(--border); }
+
+        /* Error Panel */
+        .error-panel { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; padding: 16px; margin-top: 16px; }
+        .error-title { color: var(--danger); font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+        .error-message { font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--text-main); word-break: break-all; }
+        .error-stack { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted); max-height: 150px; overflow: auto; white-space: pre-wrap; }
+
+        /* Export Button */
+        .export-btn { padding: 10px 20px; background: var(--primary); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .export-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4); }
+
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; padding: 40px; overflow: auto; z-index: 1000; cursor: zoom-out; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="nav-icon active" id="btn-dash" onclick="switchTab('dashboard')" title="Analytics"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="nav-icon" id="btn-audit" onclick="switchTab('audit')" title="Run History"><i class="fa-solid fa-history"></i></div>
+        <div class="nav-icon" id="btn-lab" onclick="switchTab('lab')" title="Test Evidence"><i class="fa-solid fa-microscope"></i></div>
+    </aside>
+
+    <main>
+        <!-- Analytics Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <h1>Infinity Analytics <span style="font-size:0.6em; color:var(--primary)">4.0</span></h1>
+            <p class="subtitle">Real-time performance metrics, browser analysis, and stability tracking.</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Stability Index</div>
+                    <div class="stat-val" style="color:var(--warning)">71.4%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg. Execution Time</div>
+                    <div class="stat-val" style="color:var(--primary)">6359ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Executions</div>
+                    <div class="stat-val">28</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pass / Fail / Skip</div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:5px">
+                        <span style="color:var(--success); font-size:1.3rem; font-weight:700"><i class="fa-solid fa-circle-check"></i> 20</span>
+                        <span style="color:var(--danger); font-size:1.3rem; font-weight:700"><i class="fa-solid fa-circle-xmark"></i> 8</span>
+                        <span style="color:var(--warning); font-size:1.3rem; font-weight:700"><i class="fa-solid fa-forward"></i> 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid - Side by Side -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-top:24px">
+                <!-- Run Time Chart -->
+                <div class="stat-card" style="padding:16px">
+                    <div class="stat-label" style="margin-bottom:12px">Run Time by Date (seconds)</div>
+                    <div style="height:160px; position:relative">
+                        <canvas id="runTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pass/Fail/Skip Chart -->
+                <div class="stat-card" style="padding:16px">
+                    <div class="stat-label" style="margin-bottom:12px">Test Results by Run</div>
+                    <div style="height:160px; position:relative">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simple Execution Mode Summary -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-top:24px">
+                <div class="stat-card" style="border-left: 4px solid #06b6d4">
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <div>
+                            <div class="stat-label"><i class="fa-solid fa-bolt" style="color:#06b6d4"></i> Parallel Execution</div>
+                            <div class="stat-val" style="color:#06b6d4">13.9s</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)">1 runs | 14 tests</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:2rem; font-weight:800; color:var(--danger)">71%</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted)">pass rate</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #f59e0b">
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <div>
+                            <div class="stat-label"><i class="fa-solid fa-arrow-right" style="color:#f59e0b"></i> Sequential Execution</div>
+                            <div class="stat-val" style="color:#f59e0b">55.3s</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)">1 runs | 14 tests</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:2rem; font-weight:800; color:var(--danger)">71%</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted)">pass rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Speed Comparison -->
+            <div class="stat-card" style="margin-top:24px; text-align:center; padding:30px">
+                <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px">Performance Gain</div>
+                <div style="font-size:3rem; font-weight:800; color:var(--primary)">
+                    4.0x
+                </div>
+                <div style="font-size:1rem; color:var(--text-muted)">faster with parallel execution</div>
+            </div>
+
+            <!-- Browser Performance (kept but simplified) -->
+            <div class="stat-card" style="margin-top:24px">
+                <div class="stat-label">Browser Performance</div>
+                <table class="browser-table">
+                    <thead>
+                        <tr>
+                            <th>Browser</th>
+                            <th>Tests</th>
+                            <th>Passed</th>
+                            <th>Failed</th>
+                            <th>Stability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td><i class="fa-brands fa-chrome" style="color:#4285F4; margin-right:8px"></i>Chrome</td>
+                            <td>28</td>
+                            <td style="color:var(--success)">20</td>
+                            <td style="color:var(--danger)">8</td>
+                            <td>
+                                <div class="stability-bar">
+                                    <div class="stability-fill" style="width:71%; background:var(--warning)"></div>
+                                </div>
+                                <span style="font-size:0.75rem">71%</span>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- Audit History -->
+        <div id="audit" class="tab-content">
+            <h1>Execution Runs</h1>
+            <p class="subtitle">Grouped execution history. Click a run to inspect detailed evidence.</p>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search by Run ID..." id="runSearch" onkeyup="filterRuns()">
+                <button class="filter-btn" onclick="exportHistory()"><i class="fa-solid fa-download"></i> Export JSON</button>
+            </div>
+
+            <div class="run-list" id="runList">
+                
+                <div class="run-card" onclick="goToRun('RUN-2026-01-19T08-23-15')" data-runid="run-2026-01-19t08-23-15">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+                        <div class="run-id">RUN-2026-01-19T08-23-15</div>
+                        <span class="badge badge-sequential"><i class="fa-solid fa-arrow-right"></i> Sequential</span>
+                    </div>
+                    <div style="font-size:0.8rem; opacity:0.6">Jan 19, 2026, 1:53 PM</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px"><i class="fa-solid fa-clock"></i> 55.3s total</div>
+                    <div class="browser-badges">
+                        <i class="fa-brands fa-chrome browser-badge" style="color:#4285F4" title="Chrome"></i>
+                    </div>
+                    <div class="run-meta">
+                        <div>Tests: <b>14</b></div>
+                        <div>
+                            <span class="badge badge-p">10 PASS</span>
+                            <span class="badge badge-f">4 FAIL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="run-card" onclick="goToRun('RUN-2026-01-19T08-22-46')" data-runid="run-2026-01-19t08-22-46">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+                        <div class="run-id">RUN-2026-01-19T08-22-46</div>
+                        <span class="badge badge-parallel"><i class="fa-solid fa-bolt"></i> Parallel</span>
+                    </div>
+                    <div style="font-size:0.8rem; opacity:0.6">Jan 19, 2026, 1:53 PM</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px"><i class="fa-solid fa-clock"></i> 13.9s total</div>
+                    <div class="browser-badges">
+                        <i class="fa-brands fa-chrome browser-badge" style="color:#4285F4" title="Chrome"></i>
+                    </div>
+                    <div class="run-meta">
+                        <div>Tests: <b>14</b></div>
+                        <div>
+                            <span class="badge badge-p">10 PASS</span>
+                            <span class="badge badge-f">4 FAIL</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Test Lab -->
+        <div id="lab" class="tab-content">
+            <h1>Test Evidence Hub</h1>
+            <p class="subtitle">Showing: <b id="currentRunName">RUN-2026-01-19T08-23-15</b> <span id="currentRunMode" class="badge badge-sequential"><i class="fa-solid fa-arrow-right"></i> Sequential</span></p>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Filter tests..." id="testSearch" onkeyup="filterTests()">
+                <button class="filter-btn" id="filterAll" onclick="setFilter('all')">All</button>
+                <button class="filter-btn" id="filterPassed" onclick="setFilter('passed')">Passed</button>
+                <button class="filter-btn" id="filterFailed" onclick="setFilter('failed')">Failed</button>
+            </div>
+
+            <div class="suite-container">
+                <div class="tc-list" id="tcList"></div>
+                <div class="details-pane" id="detailsPane">
+                    <div class="pane-header">
+                        <div class="pane-title" id="tcName">Select a test scenario...</div>
+                        <div class="pane-meta" id="tcMeta"></div>
+                    </div>
+                    <div class="pane-content">
+                        <div class="timeline" id="timeline"></div>
+                        <div class="viewer">
+                            <div class="viewer-main">
+                                <img src="" id="mainImg" class="viewer-img" onclick="openZoom()">
+                            </div>
+                            <div class="viewer-footer">
+                                <span id="stepName">Step Evidence</span>
+                                <span style="color:var(--primary); cursor:pointer; font-weight:700" onclick="openZoom()">FULL VIEW <i class="fa-solid fa-expand"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="errorPanel"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="overlay" onclick="closeZoom()"><img id="zoomImg" style="width:100%"></div>
+
+    <script>
+        const historyData = [{"testId":"TC6","runId":"RUN-2026-01-19T08-22-46","testName":"Reset Functionality - Verify Reset button clears all filters and restores default state","description":"TC6: Reset Functionality - Verify Reset button clears all filters and restores default state","status":"passed","duration":11904,"timestamp":"2026-01-19T08:23:00.836Z","steps":[{"name":"Apply a filter and verify the Reset button becomes visible","status":"passed","duration":844,"timestamp":"2026-01-19T08:23:00.826Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Filter-Applied---Reset-Button-Visible-0f92e11696616554cdb24c2a042906299ae8e332.png"},{"name":"Click Reset button and verify filters are cleared and button is hidden","status":"passed","duration":493,"timestamp":"2026-01-19T08:23:00.832Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Reset-Complete---Default-State-Restored-783cb2aabfcf29dcd79e7afce9205af1d6737a6e.png"}],"executionMode":"test:parallel","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC1","runId":"RUN-2026-01-19T08-22-46","testName":"Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","description":"TC1: Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","status":"passed","duration":12231,"timestamp":"2026-01-19T08:23:01.024Z","steps":[{"name":"Navigate to page and verify initial table visibility","status":"passed","duration":701,"timestamp":"2026-01-19T08:23:01.015Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Page-Navigation-Complete-e42c17d205bfccd7c3da2274cd3ef9071481013e.png"},{"name":"Apply Java language filter using the radio button selector","status":"passed","duration":422,"timestamp":"2026-01-19T08:23:01.019Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Java-Filter-Applied-93935b3f1302a2604ffd22d83155256db5721fcd.png"},{"name":"Validate that all visible table rows contain only Java courses","status":"passed","duration":728,"timestamp":"2026-01-19T08:23:01.022Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Rows-Verified-as-Java-Courses-2fab79d1d154cf9d3fbb17e540597303e86b1f3b.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC4","runId":"RUN-2026-01-19T08-22-46","testName":"Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","description":"TC4: Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","status":"passed","duration":12302,"timestamp":"2026-01-19T08:23:01.041Z","steps":[{"name":"Apply all three filters sequentially - Language, Level, and Enrollment","status":"passed","duration":1392,"timestamp":"2026-01-19T08:23:01.036Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Three-Filters-Applied-Successfully-042b3052bc2fd97de43f55568697fea19c72c1c0.png"},{"name":"Validate all rows satisfy all three filter conditions simultaneously","status":"passed","duration":494,"timestamp":"2026-01-19T08:23:01.039Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Rows-Meet-Combined-Filter-Criteria-1b4c816e40d17a50a517736bce5e86fbcfb9b7a6.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC5","runId":"RUN-2026-01-19T08-22-46","testName":"Empty State - Verify \"No courses found\" message appears when filters return zero results","description":"TC5: Empty State - Verify \"No courses found\" message appears when filters return zero results","status":"passed","duration":12256,"timestamp":"2026-01-19T08:23:01.085Z","steps":[{"name":"Navigate to page and uncheck all level filters to create empty state","status":"passed","duration":1303,"timestamp":"2026-01-19T08:23:01.080Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Level-Filters-Unchecked-30937cdbd7a3ee44d5b287b9876c446701b12ecf.png"},{"name":"Verify the \"No courses match\" message is displayed to the user","status":"passed","duration":398,"timestamp":"2026-01-19T08:23:01.083Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/No-Results-Message-Displayed-0352fc6d191d48726313846278cb1d3d59d83c3b.png"}],"executionMode":"test:parallel","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC7","runId":"RUN-2026-01-19T08-22-46","testName":"Numeric Sorting - Verify table sorts by Enrollments column in ascending order","description":"TC7: Numeric Sorting - Verify table sorts by Enrollments column in ascending order","status":"passed","duration":12314,"timestamp":"2026-01-19T08:23:01.237Z","steps":[{"name":"Navigate to page and trigger sort by Enrollments column","status":"passed","duration":838,"timestamp":"2026-01-19T08:23:01.231Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Sort-by-Enrollments-Selected-23cb57f662c67a981c2b69706b53ce01c4b45846.png"},{"name":"Validate enrollment values are in ascending numerical order","status":"passed","duration":928,"timestamp":"2026-01-19T08:23:01.234Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Ascending-Order-Verified-f399b2747d51f3dab0ec6556377521b405c73102.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC8","runId":"RUN-2026-01-19T08-22-46","testName":"Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","description":"TC8: Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","status":"passed","duration":11978,"timestamp":"2026-01-19T08:23:01.265Z","steps":[{"name":"Navigate to page and trigger sort by Course Name column","status":"passed","duration":846,"timestamp":"2026-01-19T08:23:01.259Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Sort-by-Course-Name-Selected-4490600506a452829834b266ecad668ff9030613.png"},{"name":"Validate course names are in alphabetical ascending order","status":"passed","duration":1014,"timestamp":"2026-01-19T08:23:01.263Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Alphabetical-Order-Verified-7f12e7aed2740d19a2e1ab3763933b7133d1dede.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC3","runId":"RUN-2026-01-19T08-22-46","testName":"Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","description":"TC3: Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","status":"passed","duration":12626,"timestamp":"2026-01-19T08:23:01.406Z","steps":[{"name":"Navigate to page and apply minimum enrollment filter of 10,000+","status":"passed","duration":1121,"timestamp":"2026-01-19T08:23:01.401Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/10-000-Enrollment-Filter-Applied-9cd337d3a3f82be0b6d511248e0ccb699f498b1c.png"},{"name":"Validate all courses have at least 10,000 enrollments","status":"passed","duration":669,"timestamp":"2026-01-19T08:23:01.404Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Courses-Meet-10-000-Enrollment-Threshold-9dd4a18b39da1f6bf636ed56b1ddd6345fb66455.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC2","runId":"RUN-2026-01-19T08-22-46","testName":"Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","description":"TC2: Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","status":"passed","duration":13020,"timestamp":"2026-01-19T08:23:01.766Z","steps":[{"name":"Navigate to the practice test table and verify page load","status":"passed","duration":828,"timestamp":"2026-01-19T08:23:01.745Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Page-Navigation-Successful-2fedbe693d7cc43c1dc6900bf6e56c2b42c1e186.png"},{"name":"Select Beginner level filter and verify checkbox state","status":"passed","duration":873,"timestamp":"2026-01-19T08:23:01.764Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Beginner-Level-Filter-Applied-f9e2176c80fe30943ca865681f07e9decc8ae58c.png"},{"name":"Verify all displayed courses are at Beginner difficulty level","status":"passed","duration":756,"timestamp":"2026-01-19T08:23:01.765Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Rows-Verified-as-Beginner-Level-e98af59e98be429ac1a1c90f0e688e0360c82759.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC10","runId":"RUN-2026-01-19T08-22-46","testName":"Table Structure - Verify table has correct column headers in expected order","description":"TC10: Table Structure - Verify table has correct column headers in expected order","status":"passed","duration":3301,"timestamp":"2026-01-19T08:23:04.360Z","steps":[{"name":"Extract and validate table column headers","status":"passed","duration":786,"timestamp":"2026-01-19T08:23:04.358Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Table-Headers-Match-Expected-Structure-e0a355c8127c76ab3b88fc5fea0b32ced66a9f18.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC9","runId":"RUN-2026-01-19T08-22-46","testName":"Link Validation - Verify course links contain valid HTTP/HTTPS URLs","description":"TC9: Link Validation - Verify course links contain valid HTTP/HTTPS URLs","status":"passed","duration":3724,"timestamp":"2026-01-19T08:23:04.600Z","steps":[{"name":"Extract course links and validate URL format","status":"passed","duration":1123,"timestamp":"2026-01-19T08:23:04.599Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Course-Links-Validated-29bfb825794dbbce524afeecbb1540bb173761a4.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC14","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Filter produces unexpected results","description":"TC14: Intentional Failure - Filter produces unexpected results","status":"failed","duration":3431,"timestamp":"2026-01-19T08:23:04.819Z","steps":[{"name":"Apply Java filter","status":"passed","duration":401,"timestamp":"2026-01-19T08:23:04.816Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Java-Filter-Applied-24f41eb76646d48d8130f44c5769e94a86599090.png"},{"name":"Assert all courses are Python (will fail)","status":"failed","duration":584,"timestamp":"2026-01-19T08:23:04.817Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Assertion-9a41e509575abb0328bceebf8bb875f5051e27ac.png","error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}},{"testId":"TC11","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Expecting wrong course count","description":"TC11: Intentional Failure - Expecting wrong course count","status":"failed","duration":3759,"timestamp":"2026-01-19T08:23:04.946Z","steps":[{"name":"Navigate to page and count courses","status":"passed","duration":406,"timestamp":"2026-01-19T08:23:04.943Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Initial-State-719faaf04f291d38f6f9467d3283b104667d83ff.png"},{"name":"Assert incorrect expected count (will fail)","status":"failed","duration":655,"timestamp":"2026-01-19T08:23:04.945Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Assertion-b608cd17b36763d4f4cf211e9b7a1a1ab3497045.png","error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}},{"testId":"TC12","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Invalid element selector","description":"TC12: Intentional Failure - Invalid element selector","status":"failed","duration":6118,"timestamp":"2026-01-19T08:23:07.305Z","steps":[{"name":"Try to find non-existent element","status":"passed","duration":337,"timestamp":"2026-01-19T08:23:07.303Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Page-State-a97b3c7fe62cc374bf7c06b6f89c3571ed9383fc.png"},{"name":"Click on element that does not exist (will timeout)","status":"failed","duration":3365,"timestamp":"2026-01-19T08:23:07.304Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Click-Attempt-2af70dfcd328788ca11d2b5aa7c1cc1971d0a5a2.png","error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}},{"testId":"TC13","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Wrong text assertion","description":"TC13: Intentional Failure - Wrong text assertion","status":"failed","duration":6153,"timestamp":"2026-01-19T08:23:07.483Z","steps":[{"name":"Check page heading","status":"passed","duration":411,"timestamp":"2026-01-19T08:23:07.481Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Heading-Check-7143da373384d7ea5963240957c2e8409b09fd57.png"},{"name":"Assert wrong heading text (will fail)","status":"failed","duration":3371,"timestamp":"2026-01-19T08:23:07.482Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Text-Assertion-d37573a0f884469576fb8facb1ce323584e5c89b.png","error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}},{"testId":"TC1","runId":"RUN-2026-01-19T08-23-15","testName":"Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","description":"TC1: Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","status":"passed","duration":4087,"timestamp":"2026-01-19T08:23:20.626Z","steps":[{"name":"Navigate to page and verify initial table visibility","status":"passed","duration":610,"timestamp":"2026-01-19T08:23:20.622Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Page-Navigation-Complete-f4dce5ca8268c5f779295164576bf2bb32480087.png"},{"name":"Apply Java language filter using the radio button selector","status":"passed","duration":224,"timestamp":"2026-01-19T08:23:20.624Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Java-Filter-Applied-86ed61b14a13c78f757d7af3f69f78b05c89dc3e.png"},{"name":"Validate that all visible table rows contain only Java courses","status":"passed","duration":319,"timestamp":"2026-01-19T08:23:20.625Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Rows-Verified-as-Java-Courses-9e8c458e7813ed52a38bef7735fb3f246109b454.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC2","runId":"RUN-2026-01-19T08-23-15","testName":"Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","description":"TC2: Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","status":"passed","duration":3794,"timestamp":"2026-01-19T08:23:24.438Z","steps":[{"name":"Navigate to the practice test table and verify page load","status":"passed","duration":637,"timestamp":"2026-01-19T08:23:24.434Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Page-Navigation-Successful-24bd3f62c9f01486788514d535d4f56f84736fba.png"},{"name":"Select Beginner level filter and verify checkbox state","status":"passed","duration":486,"timestamp":"2026-01-19T08:23:24.436Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Beginner-Level-Filter-Applied-b58052fea05742e8bc17011b6a1eaee1d6a4b3ee.png"},{"name":"Verify all displayed courses are at Beginner difficulty level","status":"passed","duration":259,"timestamp":"2026-01-19T08:23:24.437Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Rows-Verified-as-Beginner-Level-b6ae4ca7dad1ae99c85534c250b6e50247aa4a7b.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC3","runId":"RUN-2026-01-19T08-23-15","testName":"Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","description":"TC3: Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","status":"passed","duration":3594,"timestamp":"2026-01-19T08:23:28.049Z","steps":[{"name":"Navigate to page and apply minimum enrollment filter of 10,000+","status":"passed","duration":816,"timestamp":"2026-01-19T08:23:28.047Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/10-000-Enrollment-Filter-Applied-0339988c150e0251da2b9fa9b8215f6b69080a85.png"},{"name":"Validate all courses have at least 10,000 enrollments","status":"passed","duration":262,"timestamp":"2026-01-19T08:23:28.048Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Courses-Meet-10-000-Enrollment-Threshold-fabd39169ef73398eb43835ef5f82596117a7cff.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC4","runId":"RUN-2026-01-19T08-23-15","testName":"Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","description":"TC4: Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","status":"passed","duration":3776,"timestamp":"2026-01-19T08:23:31.844Z","steps":[{"name":"Apply all three filters sequentially - Language, Level, and Enrollment","status":"passed","duration":1081,"timestamp":"2026-01-19T08:23:31.842Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Three-Filters-Applied-Successfully-f59a67a2acc188c7ea709fe88a6ac0c6644e7099.png"},{"name":"Validate all rows satisfy all three filter conditions simultaneously","status":"passed","duration":226,"timestamp":"2026-01-19T08:23:31.843Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Rows-Meet-Combined-Filter-Criteria-67f5d59f260d73b8f15d2adc6f6e468cd663cd1c.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC5","runId":"RUN-2026-01-19T08-23-15","testName":"Empty State - Verify \"No courses found\" message appears when filters return zero results","description":"TC5: Empty State - Verify \"No courses found\" message appears when filters return zero results","status":"passed","duration":3725,"timestamp":"2026-01-19T08:23:35.585Z","steps":[{"name":"Navigate to page and uncheck all level filters to create empty state","status":"passed","duration":949,"timestamp":"2026-01-19T08:23:35.583Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Level-Filters-Unchecked-b7425b3b65d3f7666aac4df43849db5e12d283da.png"},{"name":"Verify the \"No courses match\" message is displayed to the user","status":"passed","duration":184,"timestamp":"2026-01-19T08:23:35.584Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/No-Results-Message-Displayed-cf83b171d81c2bfa3a98bdced04c5c209e0851dd.png"}],"executionMode":"test:sequential","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC6","runId":"RUN-2026-01-19T08-23-15","testName":"Reset Functionality - Verify Reset button clears all filters and restores default state","description":"TC6: Reset Functionality - Verify Reset button clears all filters and restores default state","status":"passed","duration":3250,"timestamp":"2026-01-19T08:23:38.851Z","steps":[{"name":"Apply a filter and verify the Reset button becomes visible","status":"passed","duration":585,"timestamp":"2026-01-19T08:23:38.849Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Filter-Applied---Reset-Button-Visible-f5bf67343a3b0f18248811e08a175c42802fe74c.png"},{"name":"Click Reset button and verify filters are cleared and button is hidden","status":"passed","duration":239,"timestamp":"2026-01-19T08:23:38.850Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Reset-Complete---Default-State-Restored-04d07f9ef9d3e56cdfde6a48c289c7384f090623.png"}],"executionMode":"test:sequential","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC7","runId":"RUN-2026-01-19T08-23-15","testName":"Numeric Sorting - Verify table sorts by Enrollments column in ascending order","description":"TC7: Numeric Sorting - Verify table sorts by Enrollments column in ascending order","status":"passed","duration":3486,"timestamp":"2026-01-19T08:23:42.355Z","steps":[{"name":"Navigate to page and trigger sort by Enrollments column","status":"passed","duration":611,"timestamp":"2026-01-19T08:23:42.353Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Sort-by-Enrollments-Selected-b4bd5742ce24893b2321bb5d03be7f15299fcd34.png"},{"name":"Validate enrollment values are in ascending numerical order","status":"passed","duration":354,"timestamp":"2026-01-19T08:23:42.354Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Ascending-Order-Verified-3b07e38e42b373635d832299ef7826ad850c0d09.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC8","runId":"RUN-2026-01-19T08-23-15","testName":"Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","description":"TC8: Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","status":"passed","duration":3828,"timestamp":"2026-01-19T08:23:46.200Z","steps":[{"name":"Navigate to page and trigger sort by Course Name column","status":"passed","duration":1072,"timestamp":"2026-01-19T08:23:46.197Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Sort-by-Course-Name-Selected-ec1f82ec10f3b0ff6796d52d5077aedf5c39ceb4.png"},{"name":"Validate course names are in alphabetical ascending order","status":"passed","duration":377,"timestamp":"2026-01-19T08:23:46.199Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Alphabetical-Order-Verified-f60e0bd05e10ace27151133b68264797e08bd3e0.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC9","runId":"RUN-2026-01-19T08-23-15","testName":"Link Validation - Verify course links contain valid HTTP/HTTPS URLs","description":"TC9: Link Validation - Verify course links contain valid HTTP/HTTPS URLs","status":"passed","duration":3184,"timestamp":"2026-01-19T08:23:49.407Z","steps":[{"name":"Extract course links and validate URL format","status":"passed","duration":723,"timestamp":"2026-01-19T08:23:49.406Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Course-Links-Validated-d737f721c8cf523634c51e6b34cb1833fe6d2ced.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC10","runId":"RUN-2026-01-19T08-23-15","testName":"Table Structure - Verify table has correct column headers in expected order","description":"TC10: Table Structure - Verify table has correct column headers in expected order","status":"passed","duration":3177,"timestamp":"2026-01-19T08:23:52.601Z","steps":[{"name":"Extract and validate table column headers","status":"passed","duration":579,"timestamp":"2026-01-19T08:23:52.599Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Table-Headers-Match-Expected-Structure-ae795b485478ed6050ba687016796c64c8eb56a0.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC11","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Expecting wrong course count","description":"TC11: Intentional Failure - Expecting wrong course count","status":"failed","duration":2804,"timestamp":"2026-01-19T08:23:55.473Z","steps":[{"name":"Navigate to page and count courses","status":"passed","duration":206,"timestamp":"2026-01-19T08:23:55.472Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Initial-State-972746e95a2b1dc2d148740f050bfdf3904a279a.png"},{"name":"Assert incorrect expected count (will fail)","status":"failed","duration":308,"timestamp":"2026-01-19T08:23:55.473Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Assertion-858058ce2b5486597fe291f04ce5b42ebd7ac975.png","error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}},{"testId":"TC12","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Invalid element selector","description":"TC12: Intentional Failure - Invalid element selector","status":"failed","duration":5636,"timestamp":"2026-01-19T08:24:02.262Z","steps":[{"name":"Try to find non-existent element","status":"passed","duration":231,"timestamp":"2026-01-19T08:24:02.261Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Page-State-71454bd5f9076fdcd388ec8b7995c47c4e3deb75.png"},{"name":"Click on element that does not exist (will timeout)","status":"failed","duration":3231,"timestamp":"2026-01-19T08:24:02.262Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Click-Attempt-28b77343d4ba2b930c4257a1b2e86bc4d0514931.png","error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}},{"testId":"TC13","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Wrong text assertion","description":"TC13: Intentional Failure - Wrong text assertion","status":"failed","duration":5662,"timestamp":"2026-01-19T08:24:09.012Z","steps":[{"name":"Check page heading","status":"passed","duration":215,"timestamp":"2026-01-19T08:24:09.009Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Heading-Check-6f5e4f6542663eca4706d9ff4121bd1ee204d881.png"},{"name":"Assert wrong heading text (will fail)","status":"failed","duration":3230,"timestamp":"2026-01-19T08:24:09.010Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Text-Assertion-8f9fa4d2095b8c8933f18a3153c822785a6061a2.png","error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}},{"testId":"TC14","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Filter produces unexpected results","description":"TC14: Intentional Failure - Filter produces unexpected results","status":"failed","duration":2921,"timestamp":"2026-01-19T08:24:13.037Z","steps":[{"name":"Apply Java filter","status":"passed","duration":237,"timestamp":"2026-01-19T08:24:13.035Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Java-Filter-Applied-d4849e8531b1f3f8083eb8c41628c1c70ba1f1f8.png"},{"name":"Assert all courses are Python (will fail)","status":"failed","duration":316,"timestamp":"2026-01-19T08:24:13.036Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Assertion-e433787f13230fc5c2cb2dadc72d11da8c44b03c.png","error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}}];
+        const runGroups = {"RUN-2026-01-19T08-22-46":{"id":"RUN-2026-01-19T08-22-46","timestamp":"2026-01-19T08:23:00.836Z","results":[{"testId":"TC6","runId":"RUN-2026-01-19T08-22-46","testName":"Reset Functionality - Verify Reset button clears all filters and restores default state","description":"TC6: Reset Functionality - Verify Reset button clears all filters and restores default state","status":"passed","duration":11904,"timestamp":"2026-01-19T08:23:00.836Z","steps":[{"name":"Apply a filter and verify the Reset button becomes visible","status":"passed","duration":844,"timestamp":"2026-01-19T08:23:00.826Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Filter-Applied---Reset-Button-Visible-0f92e11696616554cdb24c2a042906299ae8e332.png"},{"name":"Click Reset button and verify filters are cleared and button is hidden","status":"passed","duration":493,"timestamp":"2026-01-19T08:23:00.832Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Reset-Complete---Default-State-Restored-783cb2aabfcf29dcd79e7afce9205af1d6737a6e.png"}],"executionMode":"test:parallel","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC1","runId":"RUN-2026-01-19T08-22-46","testName":"Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","description":"TC1: Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","status":"passed","duration":12231,"timestamp":"2026-01-19T08:23:01.024Z","steps":[{"name":"Navigate to page and verify initial table visibility","status":"passed","duration":701,"timestamp":"2026-01-19T08:23:01.015Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Page-Navigation-Complete-e42c17d205bfccd7c3da2274cd3ef9071481013e.png"},{"name":"Apply Java language filter using the radio button selector","status":"passed","duration":422,"timestamp":"2026-01-19T08:23:01.019Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Java-Filter-Applied-93935b3f1302a2604ffd22d83155256db5721fcd.png"},{"name":"Validate that all visible table rows contain only Java courses","status":"passed","duration":728,"timestamp":"2026-01-19T08:23:01.022Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Rows-Verified-as-Java-Courses-2fab79d1d154cf9d3fbb17e540597303e86b1f3b.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC4","runId":"RUN-2026-01-19T08-22-46","testName":"Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","description":"TC4: Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","status":"passed","duration":12302,"timestamp":"2026-01-19T08:23:01.041Z","steps":[{"name":"Apply all three filters sequentially - Language, Level, and Enrollment","status":"passed","duration":1392,"timestamp":"2026-01-19T08:23:01.036Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Three-Filters-Applied-Successfully-042b3052bc2fd97de43f55568697fea19c72c1c0.png"},{"name":"Validate all rows satisfy all three filter conditions simultaneously","status":"passed","duration":494,"timestamp":"2026-01-19T08:23:01.039Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Rows-Meet-Combined-Filter-Criteria-1b4c816e40d17a50a517736bce5e86fbcfb9b7a6.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC5","runId":"RUN-2026-01-19T08-22-46","testName":"Empty State - Verify \"No courses found\" message appears when filters return zero results","description":"TC5: Empty State - Verify \"No courses found\" message appears when filters return zero results","status":"passed","duration":12256,"timestamp":"2026-01-19T08:23:01.085Z","steps":[{"name":"Navigate to page and uncheck all level filters to create empty state","status":"passed","duration":1303,"timestamp":"2026-01-19T08:23:01.080Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Level-Filters-Unchecked-30937cdbd7a3ee44d5b287b9876c446701b12ecf.png"},{"name":"Verify the \"No courses match\" message is displayed to the user","status":"passed","duration":398,"timestamp":"2026-01-19T08:23:01.083Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/No-Results-Message-Displayed-0352fc6d191d48726313846278cb1d3d59d83c3b.png"}],"executionMode":"test:parallel","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC7","runId":"RUN-2026-01-19T08-22-46","testName":"Numeric Sorting - Verify table sorts by Enrollments column in ascending order","description":"TC7: Numeric Sorting - Verify table sorts by Enrollments column in ascending order","status":"passed","duration":12314,"timestamp":"2026-01-19T08:23:01.237Z","steps":[{"name":"Navigate to page and trigger sort by Enrollments column","status":"passed","duration":838,"timestamp":"2026-01-19T08:23:01.231Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Sort-by-Enrollments-Selected-23cb57f662c67a981c2b69706b53ce01c4b45846.png"},{"name":"Validate enrollment values are in ascending numerical order","status":"passed","duration":928,"timestamp":"2026-01-19T08:23:01.234Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Ascending-Order-Verified-f399b2747d51f3dab0ec6556377521b405c73102.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC8","runId":"RUN-2026-01-19T08-22-46","testName":"Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","description":"TC8: Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","status":"passed","duration":11978,"timestamp":"2026-01-19T08:23:01.265Z","steps":[{"name":"Navigate to page and trigger sort by Course Name column","status":"passed","duration":846,"timestamp":"2026-01-19T08:23:01.259Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Sort-by-Course-Name-Selected-4490600506a452829834b266ecad668ff9030613.png"},{"name":"Validate course names are in alphabetical ascending order","status":"passed","duration":1014,"timestamp":"2026-01-19T08:23:01.263Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Alphabetical-Order-Verified-7f12e7aed2740d19a2e1ab3763933b7133d1dede.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC3","runId":"RUN-2026-01-19T08-22-46","testName":"Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","description":"TC3: Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","status":"passed","duration":12626,"timestamp":"2026-01-19T08:23:01.406Z","steps":[{"name":"Navigate to page and apply minimum enrollment filter of 10,000+","status":"passed","duration":1121,"timestamp":"2026-01-19T08:23:01.401Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/10-000-Enrollment-Filter-Applied-9cd337d3a3f82be0b6d511248e0ccb699f498b1c.png"},{"name":"Validate all courses have at least 10,000 enrollments","status":"passed","duration":669,"timestamp":"2026-01-19T08:23:01.404Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Courses-Meet-10-000-Enrollment-Threshold-9dd4a18b39da1f6bf636ed56b1ddd6345fb66455.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC2","runId":"RUN-2026-01-19T08-22-46","testName":"Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","description":"TC2: Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","status":"passed","duration":13020,"timestamp":"2026-01-19T08:23:01.766Z","steps":[{"name":"Navigate to the practice test table and verify page load","status":"passed","duration":828,"timestamp":"2026-01-19T08:23:01.745Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Page-Navigation-Successful-2fedbe693d7cc43c1dc6900bf6e56c2b42c1e186.png"},{"name":"Select Beginner level filter and verify checkbox state","status":"passed","duration":873,"timestamp":"2026-01-19T08:23:01.764Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Beginner-Level-Filter-Applied-f9e2176c80fe30943ca865681f07e9decc8ae58c.png"},{"name":"Verify all displayed courses are at Beginner difficulty level","status":"passed","duration":756,"timestamp":"2026-01-19T08:23:01.765Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/All-Rows-Verified-as-Beginner-Level-e98af59e98be429ac1a1c90f0e688e0360c82759.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC10","runId":"RUN-2026-01-19T08-22-46","testName":"Table Structure - Verify table has correct column headers in expected order","description":"TC10: Table Structure - Verify table has correct column headers in expected order","status":"passed","duration":3301,"timestamp":"2026-01-19T08:23:04.360Z","steps":[{"name":"Extract and validate table column headers","status":"passed","duration":786,"timestamp":"2026-01-19T08:23:04.358Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Table-Headers-Match-Expected-Structure-e0a355c8127c76ab3b88fc5fea0b32ced66a9f18.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC9","runId":"RUN-2026-01-19T08-22-46","testName":"Link Validation - Verify course links contain valid HTTP/HTTPS URLs","description":"TC9: Link Validation - Verify course links contain valid HTTP/HTTPS URLs","status":"passed","duration":3724,"timestamp":"2026-01-19T08:23:04.600Z","steps":[{"name":"Extract course links and validate URL format","status":"passed","duration":1123,"timestamp":"2026-01-19T08:23:04.599Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Course-Links-Validated-29bfb825794dbbce524afeecbb1540bb173761a4.png"}],"executionMode":"test:parallel","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC14","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Filter produces unexpected results","description":"TC14: Intentional Failure - Filter produces unexpected results","status":"failed","duration":3431,"timestamp":"2026-01-19T08:23:04.819Z","steps":[{"name":"Apply Java filter","status":"passed","duration":401,"timestamp":"2026-01-19T08:23:04.816Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Java-Filter-Applied-24f41eb76646d48d8130f44c5769e94a86599090.png"},{"name":"Assert all courses are Python (will fail)","status":"failed","duration":584,"timestamp":"2026-01-19T08:23:04.817Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Assertion-9a41e509575abb0328bceebf8bb875f5051e27ac.png","error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}},{"testId":"TC11","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Expecting wrong course count","description":"TC11: Intentional Failure - Expecting wrong course count","status":"failed","duration":3759,"timestamp":"2026-01-19T08:23:04.946Z","steps":[{"name":"Navigate to page and count courses","status":"passed","duration":406,"timestamp":"2026-01-19T08:23:04.943Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Initial-State-719faaf04f291d38f6f9467d3283b104667d83ff.png"},{"name":"Assert incorrect expected count (will fail)","status":"failed","duration":655,"timestamp":"2026-01-19T08:23:04.945Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Assertion-b608cd17b36763d4f4cf211e9b7a1a1ab3497045.png","error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}},{"testId":"TC12","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Invalid element selector","description":"TC12: Intentional Failure - Invalid element selector","status":"failed","duration":6118,"timestamp":"2026-01-19T08:23:07.305Z","steps":[{"name":"Try to find non-existent element","status":"passed","duration":337,"timestamp":"2026-01-19T08:23:07.303Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Page-State-a97b3c7fe62cc374bf7c06b6f89c3571ed9383fc.png"},{"name":"Click on element that does not exist (will timeout)","status":"failed","duration":3365,"timestamp":"2026-01-19T08:23:07.304Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Click-Attempt-2af70dfcd328788ca11d2b5aa7c1cc1971d0a5a2.png","error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}},{"testId":"TC13","runId":"RUN-2026-01-19T08-22-46","testName":"Intentional Failure - Wrong text assertion","description":"TC13: Intentional Failure - Wrong text assertion","status":"failed","duration":6153,"timestamp":"2026-01-19T08:23:07.483Z","steps":[{"name":"Check page heading","status":"passed","duration":411,"timestamp":"2026-01-19T08:23:07.481Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Heading-Check-7143da373384d7ea5963240957c2e8409b09fd57.png"},{"name":"Assert wrong heading text (will fail)","status":"failed","duration":3371,"timestamp":"2026-01-19T08:23:07.482Z","screenshot":"screenshots/RUN-2026-01-19T08-22-46/Before-Text-Assertion-d37573a0f884469576fb8facb1ce323584e5c89b.png","error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}}],"executionMode":"test:parallel","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}}],"passed":10,"failed":4,"duration":125117,"wallClockTime":13950,"browsers":["chromium"],"executionMode":"parallel"},"RUN-2026-01-19T08-23-15":{"id":"RUN-2026-01-19T08-23-15","timestamp":"2026-01-19T08:23:20.626Z","results":[{"testId":"TC1","runId":"RUN-2026-01-19T08-23-15","testName":"Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","description":"TC1: Filter by Programming Language - Verify that selecting Java language filter displays only Java courses","status":"passed","duration":4087,"timestamp":"2026-01-19T08:23:20.626Z","steps":[{"name":"Navigate to page and verify initial table visibility","status":"passed","duration":610,"timestamp":"2026-01-19T08:23:20.622Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Page-Navigation-Complete-f4dce5ca8268c5f779295164576bf2bb32480087.png"},{"name":"Apply Java language filter using the radio button selector","status":"passed","duration":224,"timestamp":"2026-01-19T08:23:20.624Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Java-Filter-Applied-86ed61b14a13c78f757d7af3f69f78b05c89dc3e.png"},{"name":"Validate that all visible table rows contain only Java courses","status":"passed","duration":319,"timestamp":"2026-01-19T08:23:20.625Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Rows-Verified-as-Java-Courses-9e8c458e7813ed52a38bef7735fb3f246109b454.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC2","runId":"RUN-2026-01-19T08-23-15","testName":"Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","description":"TC2: Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses","status":"passed","duration":3794,"timestamp":"2026-01-19T08:23:24.438Z","steps":[{"name":"Navigate to the practice test table and verify page load","status":"passed","duration":637,"timestamp":"2026-01-19T08:23:24.434Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Page-Navigation-Successful-24bd3f62c9f01486788514d535d4f56f84736fba.png"},{"name":"Select Beginner level filter and verify checkbox state","status":"passed","duration":486,"timestamp":"2026-01-19T08:23:24.436Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Beginner-Level-Filter-Applied-b58052fea05742e8bc17011b6a1eaee1d6a4b3ee.png"},{"name":"Verify all displayed courses are at Beginner difficulty level","status":"passed","duration":259,"timestamp":"2026-01-19T08:23:24.437Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Rows-Verified-as-Beginner-Level-b6ae4ca7dad1ae99c85534c250b6e50247aa4a7b.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC3","runId":"RUN-2026-01-19T08-23-15","testName":"Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","description":"TC3: Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment","status":"passed","duration":3594,"timestamp":"2026-01-19T08:23:28.049Z","steps":[{"name":"Navigate to page and apply minimum enrollment filter of 10,000+","status":"passed","duration":816,"timestamp":"2026-01-19T08:23:28.047Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/10-000-Enrollment-Filter-Applied-0339988c150e0251da2b9fa9b8215f6b69080a85.png"},{"name":"Validate all courses have at least 10,000 enrollments","status":"passed","duration":262,"timestamp":"2026-01-19T08:23:28.048Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Courses-Meet-10-000-Enrollment-Threshold-fabd39169ef73398eb43835ef5f82596117a7cff.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC4","runId":"RUN-2026-01-19T08-23-15","testName":"Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","description":"TC4: Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)","status":"passed","duration":3776,"timestamp":"2026-01-19T08:23:31.844Z","steps":[{"name":"Apply all three filters sequentially - Language, Level, and Enrollment","status":"passed","duration":1081,"timestamp":"2026-01-19T08:23:31.842Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Three-Filters-Applied-Successfully-f59a67a2acc188c7ea709fe88a6ac0c6644e7099.png"},{"name":"Validate all rows satisfy all three filter conditions simultaneously","status":"passed","duration":226,"timestamp":"2026-01-19T08:23:31.843Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Rows-Meet-Combined-Filter-Criteria-67f5d59f260d73b8f15d2adc6f6e468cd663cd1c.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Filter Tests","retryCount":0},{"testId":"TC5","runId":"RUN-2026-01-19T08-23-15","testName":"Empty State - Verify \"No courses found\" message appears when filters return zero results","description":"TC5: Empty State - Verify \"No courses found\" message appears when filters return zero results","status":"passed","duration":3725,"timestamp":"2026-01-19T08:23:35.585Z","steps":[{"name":"Navigate to page and uncheck all level filters to create empty state","status":"passed","duration":949,"timestamp":"2026-01-19T08:23:35.583Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/All-Level-Filters-Unchecked-b7425b3b65d3f7666aac4df43849db5e12d283da.png"},{"name":"Verify the \"No courses match\" message is displayed to the user","status":"passed","duration":184,"timestamp":"2026-01-19T08:23:35.584Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/No-Results-Message-Displayed-cf83b171d81c2bfa3a98bdced04c5c209e0851dd.png"}],"executionMode":"test:sequential","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC6","runId":"RUN-2026-01-19T08-23-15","testName":"Reset Functionality - Verify Reset button clears all filters and restores default state","description":"TC6: Reset Functionality - Verify Reset button clears all filters and restores default state","status":"passed","duration":3250,"timestamp":"2026-01-19T08:23:38.851Z","steps":[{"name":"Apply a filter and verify the Reset button becomes visible","status":"passed","duration":585,"timestamp":"2026-01-19T08:23:38.849Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Filter-Applied---Reset-Button-Visible-f5bf67343a3b0f18248811e08a175c42802fe74c.png"},{"name":"Click Reset button and verify filters are cleared and button is hidden","status":"passed","duration":239,"timestamp":"2026-01-19T08:23:38.850Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Reset-Complete---Default-State-Restored-04d07f9ef9d3e56cdfde6a48c289c7384f090623.png"}],"executionMode":"test:sequential","browser":"chromium","category":"UI State Tests","retryCount":0},{"testId":"TC7","runId":"RUN-2026-01-19T08-23-15","testName":"Numeric Sorting - Verify table sorts by Enrollments column in ascending order","description":"TC7: Numeric Sorting - Verify table sorts by Enrollments column in ascending order","status":"passed","duration":3486,"timestamp":"2026-01-19T08:23:42.355Z","steps":[{"name":"Navigate to page and trigger sort by Enrollments column","status":"passed","duration":611,"timestamp":"2026-01-19T08:23:42.353Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Sort-by-Enrollments-Selected-b4bd5742ce24893b2321bb5d03be7f15299fcd34.png"},{"name":"Validate enrollment values are in ascending numerical order","status":"passed","duration":354,"timestamp":"2026-01-19T08:23:42.354Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Ascending-Order-Verified-3b07e38e42b373635d832299ef7826ad850c0d09.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC8","runId":"RUN-2026-01-19T08-23-15","testName":"Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","description":"TC8: Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order","status":"passed","duration":3828,"timestamp":"2026-01-19T08:23:46.200Z","steps":[{"name":"Navigate to page and trigger sort by Course Name column","status":"passed","duration":1072,"timestamp":"2026-01-19T08:23:46.197Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Sort-by-Course-Name-Selected-ec1f82ec10f3b0ff6796d52d5077aedf5c39ceb4.png"},{"name":"Validate course names are in alphabetical ascending order","status":"passed","duration":377,"timestamp":"2026-01-19T08:23:46.199Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Alphabetical-Order-Verified-f60e0bd05e10ace27151133b68264797e08bd3e0.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Sorting Tests","retryCount":0},{"testId":"TC9","runId":"RUN-2026-01-19T08-23-15","testName":"Link Validation - Verify course links contain valid HTTP/HTTPS URLs","description":"TC9: Link Validation - Verify course links contain valid HTTP/HTTPS URLs","status":"passed","duration":3184,"timestamp":"2026-01-19T08:23:49.407Z","steps":[{"name":"Extract course links and validate URL format","status":"passed","duration":723,"timestamp":"2026-01-19T08:23:49.406Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Course-Links-Validated-d737f721c8cf523634c51e6b34cb1833fe6d2ced.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC10","runId":"RUN-2026-01-19T08-23-15","testName":"Table Structure - Verify table has correct column headers in expected order","description":"TC10: Table Structure - Verify table has correct column headers in expected order","status":"passed","duration":3177,"timestamp":"2026-01-19T08:23:52.601Z","steps":[{"name":"Extract and validate table column headers","status":"passed","duration":579,"timestamp":"2026-01-19T08:23:52.599Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Table-Headers-Match-Expected-Structure-ae795b485478ed6050ba687016796c64c8eb56a0.png"}],"executionMode":"test:sequential","browser":"chromium","category":"Data Integrity Tests","retryCount":0},{"testId":"TC11","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Expecting wrong course count","description":"TC11: Intentional Failure - Expecting wrong course count","status":"failed","duration":2804,"timestamp":"2026-01-19T08:23:55.473Z","steps":[{"name":"Navigate to page and count courses","status":"passed","duration":206,"timestamp":"2026-01-19T08:23:55.472Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Initial-State-972746e95a2b1dc2d148740f050bfdf3904a279a.png"},{"name":"Assert incorrect expected count (will fail)","status":"failed","duration":308,"timestamp":"2026-01-19T08:23:55.473Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Assertion-858058ce2b5486597fe291f04ce5b42ebd7ac975.png","error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m","stack":"Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"}},{"testId":"TC12","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Invalid element selector","description":"TC12: Intentional Failure - Invalid element selector","status":"failed","duration":5636,"timestamp":"2026-01-19T08:24:02.262Z","steps":[{"name":"Try to find non-existent element","status":"passed","duration":231,"timestamp":"2026-01-19T08:24:02.261Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Page-State-71454bd5f9076fdcd388ec8b7995c47c4e3deb75.png"},{"name":"Click on element that does not exist (will timeout)","status":"failed","duration":3231,"timestamp":"2026-01-19T08:24:02.262Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Click-Attempt-28b77343d4ba2b930c4257a1b2e86bc4d0514931.png","error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n","stack":"TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"}},{"testId":"TC13","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Wrong text assertion","description":"TC13: Intentional Failure - Wrong text assertion","status":"failed","duration":5662,"timestamp":"2026-01-19T08:24:09.012Z","steps":[{"name":"Check page heading","status":"passed","duration":215,"timestamp":"2026-01-19T08:24:09.009Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Heading-Check-6f5e4f6542663eca4706d9ff4121bd1ee204d881.png"},{"name":"Assert wrong heading text (will fail)","status":"failed","duration":3230,"timestamp":"2026-01-19T08:24:09.010Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Text-Assertion-8f9fa4d2095b8c8933f18a3153c822785a6061a2.png","error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n","stack":"Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"}},{"testId":"TC14","runId":"RUN-2026-01-19T08-23-15","testName":"Intentional Failure - Filter produces unexpected results","description":"TC14: Intentional Failure - Filter produces unexpected results","status":"failed","duration":2921,"timestamp":"2026-01-19T08:24:13.037Z","steps":[{"name":"Apply Java filter","status":"passed","duration":237,"timestamp":"2026-01-19T08:24:13.035Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Java-Filter-Applied-d4849e8531b1f3f8083eb8c41628c1c70ba1f1f8.png"},{"name":"Assert all courses are Python (will fail)","status":"failed","duration":316,"timestamp":"2026-01-19T08:24:13.036Z","screenshot":"screenshots/RUN-2026-01-19T08-23-15/Before-Assertion-e433787f13230fc5c2cb2dadc72d11da8c44b03c.png","error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}}],"executionMode":"test:sequential","browser":"chromium","category":"Other","retryCount":0,"error":{"message":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m","stack":"Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"}}],"passed":10,"failed":4,"duration":52924,"wallClockTime":55332,"browsers":["chromium"],"executionMode":"sequential"}};
+        const browserInfo = {"chromium":{"name":"Chrome","icon":"fa-brands fa-chrome","color":"#4285F4"},"firefox":{"name":"Firefox","icon":"fa-brands fa-firefox-browser","color":"#FF7139"},"webkit":{"name":"Safari","icon":"fa-brands fa-safari","color":"#006CFF"}};
+        let currentRun = 'RUN-2026-01-19T08-23-15';
+        let currentFilter = 'all';
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            const btnId = id === 'dashboard' ? 'btn-dash' : id === 'audit' ? 'btn-audit' : 'btn-lab';
+            document.getElementById(btnId).classList.add('active');
+        }
+
+        function goToRun(id) {
+            currentRun = id;
+            const run = runGroups[id];
+            document.getElementById('currentRunName').innerText = id;
+            // Update execution mode badge
+            const modeEl = document.getElementById('currentRunMode');
+            if (run && modeEl) {
+                const isParallel = run.executionMode === 'parallel';
+                modeEl.className = 'badge ' + (isParallel ? 'badge-parallel' : 'badge-sequential');
+                modeEl.innerHTML = isParallel ? '<i class="fa-solid fa-bolt"></i> Parallel' : '<i class="fa-solid fa-arrow-right"></i> Sequential';
+            }
+            updateTCList();
+            switchTab('lab');
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('active');
+            updateTCList();
+        }
+
+        function filterRuns() {
+            const search = document.getElementById('runSearch').value.toLowerCase();
+            document.querySelectorAll('.run-card').forEach(card => {
+                const runId = card.getAttribute('data-runid');
+                card.style.display = runId.includes(search) ? 'block' : 'none';
+            });
+        }
+
+        function filterTests() {
+            const search = document.getElementById('testSearch').value.toLowerCase();
+            document.querySelectorAll('.tc-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const matchesSearch = text.includes(search);
+                const matchesFilter = currentFilter === 'all' || card.getAttribute('data-status') === currentFilter;
+                card.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
+            });
+        }
+
+        function exportHistory() {
+            const dataStr = JSON.stringify(historyData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test-execution-history.json';
+            a.click();
+        }
+
+        function updateTCList() {
+            const run = runGroups[currentRun];
+            if (!run) return;
+
+            const list = document.getElementById('tcList');
+            const filteredResults = run.results.filter(r => {
+                if (currentFilter === 'all') return true;
+                return r.status === currentFilter;
+            });
+
+            list.innerHTML = filteredResults.map(r => {
+                const browser = r.browser || 'chromium';
+                const category = r.category || 'Other';
+                return `
+                <div class="tc-card" onclick="viewTest('${r.testId}', '${r.browser || 'chromium'}')" data-id="${r.testId}-${browser}" data-status="${r.status}">
+                    <div class="tc-header">
+                        <span class="tc-title">${r.testId}: ${r.testName}</span>
+                        <div class="tc-status-icon ${r.status}"></div>
+                    </div>
+                    <div class="tc-meta">
+                        <span class="tc-browser"><i class="${browserInfo[browser].icon}" style="color:${browserInfo[browser].color}"></i> ${browserInfo[browser].name}</span>
+                        <span class="tc-category">${category}</span>
+                        <span>${r.duration}ms</span>
+                    </div>
+                </div>
+            `}).join('');
+
+            if (filteredResults.length > 0) {
+                viewTest(filteredResults[0].testId, filteredResults[0].browser || 'chromium');
+            }
+        }
+
+        function viewTest(testId, browser) {
+            const run = runGroups[currentRun];
+            const result = run.results.find(r => r.testId === testId && (r.browser || 'chromium') === browser);
+            if (!result) return;
+
+            document.querySelectorAll('.tc-card').forEach(c => c.classList.remove('active'));
+            const activeCard = document.querySelector(`.tc-card[data-id="${testId}-${browser}"]`);
+            if (activeCard) activeCard.classList.add('active');
+
+            document.getElementById('tcName').innerText = result.testName;
+            document.getElementById('tcMeta').innerHTML = `
+                <span><i class="fa-solid fa-clock"></i> ${result.duration}ms</span>
+                <span><i class="${browserInfo[result.browser || 'chromium'].icon}" style="color:${browserInfo[result.browser || 'chromium'].color}"></i> ${browserInfo[result.browser || 'chromium'].name}</span>
+                <span><i class="fa-solid fa-folder"></i> ${result.category || 'Other'}</span>
+                <span class="badge ${result.status === 'passed' ? 'badge-p' : 'badge-f'}">${result.status.toUpperCase()}</span>
+            `;
+
+            // Clear error panel - will be shown when failed step is selected
+            document.getElementById('errorPanel').innerHTML = '';
+
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = result.steps.map((s, i) => `
+                <div class="step-item" id="step-${i}" onclick="setStep(${i}, '${testId}', '${browser}')">
+                    <div class="step-header">
+                        <span class="step-number">STEP ${String(i+1).padStart(2, '0')}</span>
+                        <div class="step-status ${s.status || 'passed'}"></div>
+                        <span class="step-name">${s.name}</span>
+                        <span class="step-duration">${s.duration || 0}ms</span>
+                    </div>
+                    <div class="step-details">
+                        ${s.expected ? `<div><b>Expected:</b> ${s.expected}</div>` : ''}
+                        ${s.actual ? `<div><b>Actual:</b> ${s.actual}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            if (result.steps.length > 0) setStep(0, testId, browser);
+        }
+
+        const noScreenshotPlaceholder = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="%231e293b" width="400" height="300"/><text fill="%2394a3b8" x="50%" y="50%" text-anchor="middle" dy=".3em" font-family="sans-serif">Screenshot Not Available</text><text fill="%23475569" x="50%" y="60%" text-anchor="middle" font-size="12" font-family="sans-serif">(File may have been overwritten by newer run)</text></svg>';
+
+        function setStep(idx, testId, browser) {
+            const run = runGroups[currentRun];
+            const result = run.results.find(r => r.testId === testId && (r.browser || 'chromium') === browser);
+            const step = result.steps[idx];
+
+            document.querySelectorAll('.step-item').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + idx).classList.add('active');
+
+            const img = document.getElementById('mainImg');
+            img.style.opacity = '0';
+
+            // Add error handler for missing screenshots
+            img.onerror = function() {
+                this.src = noScreenshotPlaceholder;
+            };
+
+            setTimeout(() => {
+                img.src = step.screenshot || noScreenshotPlaceholder;
+                img.style.opacity = '1';
+                document.getElementById('stepName').innerText = 'Step ' + String(idx+1).padStart(2, '0') + ' | ' + step.name;
+            }, 100);
+
+            // Show error panel only for failed steps
+            const errorPanel = document.getElementById('errorPanel');
+            if (step.status === 'failed' && (step.error || result.error)) {
+                const err = step.error || result.error;
+                errorPanel.innerHTML = `
+                    <div class="error-panel" style="margin:20px">
+                        <div class="error-title"><i class="fa-solid fa-bug"></i> Error Details</div>
+                        <div class="error-message">${err.message || 'Step failed'}</div>
+                        ${err.stack ? `<div class="error-stack">${err.stack}</div>` : ''}
+                    </div>
+                `;
+            } else {
+                errorPanel.innerHTML = '';
+            }
+        }
+
+        function openZoom() {
+            document.getElementById('zoomImg').src = document.getElementById('mainImg').src;
+            document.getElementById('overlay').style.display = 'block';
+        }
+        function closeZoom() { document.getElementById('overlay').style.display = 'none'; }
+
+        // Run Time Chart Data - Simple run time by date with execution mode
+        const runTimeData = [{"label":"Jan 19, 01:53 PM","runId":"RUN-2026-01-19T08-22-46","runTime":"13.9","mode":"parallel","passed":10,"failed":4,"total":14},{"label":"Jan 19, 01:53 PM","runId":"RUN-2026-01-19T08-23-15","runTime":"55.3","mode":"sequential","passed":10,"failed":4,"total":14}];
+
+        // Run Time Bar Chart - Color coded by execution mode (Cyan for parallel, Orange for sequential)
+        new Chart(document.getElementById('runTimeChart'), {
+            type: 'bar',
+            data: {
+                labels: runTimeData.map(r => r.label),
+                datasets: [{
+                    label: 'Run Time (seconds)',
+                    data: runTimeData.map(r => parseFloat(r.runTime)),
+                    backgroundColor: runTimeData.map(r => r.mode === 'parallel' ? '#06b6d4' : '#f59e0b'),
+                    borderRadius: 4,
+                    borderSkipped: false,
+                    barThickness: 32,
+                    maxBarThickness: 40,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => runTimeData[items[0].dataIndex].runId,
+                            label: (item) => {
+                                const d = runTimeData[item.dataIndex];
+                                return [
+                                    'Run Time: ' + d.runTime + 's',
+                                    'Mode: ' + (d.mode === 'parallel' ? 'Parallel ⚡' : 'Sequential →'),
+                                    'Tests: ' + d.passed + ' passed / ' + d.failed + ' failed'
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 0 },
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Seconds', color: '#64748b', font: { size: 10 } },
+                        ticks: { color: '#94a3b8', font: { size: 9 } },
+                        grid: { color: 'rgba(255,255,255,0.03)' }
+                    }
+                }
+            }
+        });
+
+        // Legend for run time chart
+        document.getElementById('runTimeChart').insertAdjacentHTML('afterend',
+            '<div style="display:flex; justify-content:center; gap:20px; margin-top:8px; font-size:0.7rem; color:#94a3b8">' +
+            '<span><span style="display:inline-block;width:8px;height:8px;background:#06b6d4;border-radius:2px;margin-right:4px"></span>Parallel</span>' +
+            '<span><span style="display:inline-block;width:8px;height:8px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>Sequential</span>' +
+            '</div>'
+        );
+
+        // Pass/Fail Stacked Bar Chart (Green for passed, Red for failed)
+        new Chart(document.getElementById('resultsChart'), {
+            type: 'bar',
+            data: {
+                labels: runTimeData.map(r => r.label),
+                datasets: [
+                    {
+                        label: 'Passed',
+                        data: runTimeData.map(r => r.passed),
+                        backgroundColor: '#22c55e',
+                        borderRadius: 2,
+                    },
+                    {
+                        label: 'Failed',
+                        data: runTimeData.map(r => r.failed),
+                        backgroundColor: '#ef4444',
+                        borderRadius: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', boxWidth: 8, boxHeight: 8, padding: 12, font: { size: 10 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => runTimeData[items[0].dataIndex].runId,
+                            afterBody: (items) => {
+                                const d = runTimeData[items[0].dataIndex];
+                                return 'Total: ' + d.total + ' tests';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 0 },
+                        grid: { display: false }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: { display: true, text: 'Tests', color: '#64748b', font: { size: 10 } },
+                        ticks: { color: '#94a3b8', font: { size: 9 } },
+                        grid: { color: 'rgba(255,255,255,0.03)' }
+                    }
+                }
+            }
+        });
+
+        // Init
+        setFilter('all');
+        updateTCList();
+    </script>
+</body>
+</html>

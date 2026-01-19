@@ -1,0 +1,878 @@
+[
+  {
+    "testId": "TC6",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Reset Functionality - Verify Reset button clears all filters and restores default state",
+    "description": "TC6: Reset Functionality - Verify Reset button clears all filters and restores default state",
+    "status": "passed",
+    "duration": 11904,
+    "timestamp": "2026-01-19T08:23:00.836Z",
+    "steps": [
+      {
+        "name": "Apply a filter and verify the Reset button becomes visible",
+        "status": "passed",
+        "duration": 844,
+        "timestamp": "2026-01-19T08:23:00.826Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Filter-Applied---Reset-Button-Visible-0f92e11696616554cdb24c2a042906299ae8e332.png"
+      },
+      {
+        "name": "Click Reset button and verify filters are cleared and button is hidden",
+        "status": "passed",
+        "duration": 493,
+        "timestamp": "2026-01-19T08:23:00.832Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Reset-Complete---Default-State-Restored-783cb2aabfcf29dcd79e7afce9205af1d6737a6e.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "UI State Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC1",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Filter by Programming Language - Verify that selecting Java language filter displays only Java courses",
+    "description": "TC1: Filter by Programming Language - Verify that selecting Java language filter displays only Java courses",
+    "status": "passed",
+    "duration": 12231,
+    "timestamp": "2026-01-19T08:23:01.024Z",
+    "steps": [
+      {
+        "name": "Navigate to page and verify initial table visibility",
+        "status": "passed",
+        "duration": 701,
+        "timestamp": "2026-01-19T08:23:01.015Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Page-Navigation-Complete-e42c17d205bfccd7c3da2274cd3ef9071481013e.png"
+      },
+      {
+        "name": "Apply Java language filter using the radio button selector",
+        "status": "passed",
+        "duration": 422,
+        "timestamp": "2026-01-19T08:23:01.019Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Java-Filter-Applied-93935b3f1302a2604ffd22d83155256db5721fcd.png"
+      },
+      {
+        "name": "Validate that all visible table rows contain only Java courses",
+        "status": "passed",
+        "duration": 728,
+        "timestamp": "2026-01-19T08:23:01.022Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/All-Rows-Verified-as-Java-Courses-2fab79d1d154cf9d3fbb17e540597303e86b1f3b.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC4",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)",
+    "description": "TC4: Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)",
+    "status": "passed",
+    "duration": 12302,
+    "timestamp": "2026-01-19T08:23:01.041Z",
+    "steps": [
+      {
+        "name": "Apply all three filters sequentially - Language, Level, and Enrollment",
+        "status": "passed",
+        "duration": 1392,
+        "timestamp": "2026-01-19T08:23:01.036Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/All-Three-Filters-Applied-Successfully-042b3052bc2fd97de43f55568697fea19c72c1c0.png"
+      },
+      {
+        "name": "Validate all rows satisfy all three filter conditions simultaneously",
+        "status": "passed",
+        "duration": 494,
+        "timestamp": "2026-01-19T08:23:01.039Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/All-Rows-Meet-Combined-Filter-Criteria-1b4c816e40d17a50a517736bce5e86fbcfb9b7a6.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC5",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Empty State - Verify \"No courses found\" message appears when filters return zero results",
+    "description": "TC5: Empty State - Verify \"No courses found\" message appears when filters return zero results",
+    "status": "passed",
+    "duration": 12256,
+    "timestamp": "2026-01-19T08:23:01.085Z",
+    "steps": [
+      {
+        "name": "Navigate to page and uncheck all level filters to create empty state",
+        "status": "passed",
+        "duration": 1303,
+        "timestamp": "2026-01-19T08:23:01.080Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/All-Level-Filters-Unchecked-30937cdbd7a3ee44d5b287b9876c446701b12ecf.png"
+      },
+      {
+        "name": "Verify the \"No courses match\" message is displayed to the user",
+        "status": "passed",
+        "duration": 398,
+        "timestamp": "2026-01-19T08:23:01.083Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/No-Results-Message-Displayed-0352fc6d191d48726313846278cb1d3d59d83c3b.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "UI State Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC7",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Numeric Sorting - Verify table sorts by Enrollments column in ascending order",
+    "description": "TC7: Numeric Sorting - Verify table sorts by Enrollments column in ascending order",
+    "status": "passed",
+    "duration": 12314,
+    "timestamp": "2026-01-19T08:23:01.237Z",
+    "steps": [
+      {
+        "name": "Navigate to page and trigger sort by Enrollments column",
+        "status": "passed",
+        "duration": 838,
+        "timestamp": "2026-01-19T08:23:01.231Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Sort-by-Enrollments-Selected-23cb57f662c67a981c2b69706b53ce01c4b45846.png"
+      },
+      {
+        "name": "Validate enrollment values are in ascending numerical order",
+        "status": "passed",
+        "duration": 928,
+        "timestamp": "2026-01-19T08:23:01.234Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Ascending-Order-Verified-f399b2747d51f3dab0ec6556377521b405c73102.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Sorting Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC8",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order",
+    "description": "TC8: Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order",
+    "status": "passed",
+    "duration": 11978,
+    "timestamp": "2026-01-19T08:23:01.265Z",
+    "steps": [
+      {
+        "name": "Navigate to page and trigger sort by Course Name column",
+        "status": "passed",
+        "duration": 846,
+        "timestamp": "2026-01-19T08:23:01.259Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Sort-by-Course-Name-Selected-4490600506a452829834b266ecad668ff9030613.png"
+      },
+      {
+        "name": "Validate course names are in alphabetical ascending order",
+        "status": "passed",
+        "duration": 1014,
+        "timestamp": "2026-01-19T08:23:01.263Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Alphabetical-Order-Verified-7f12e7aed2740d19a2e1ab3763933b7133d1dede.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Sorting Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC3",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment",
+    "description": "TC3: Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment",
+    "status": "passed",
+    "duration": 12626,
+    "timestamp": "2026-01-19T08:23:01.406Z",
+    "steps": [
+      {
+        "name": "Navigate to page and apply minimum enrollment filter of 10,000+",
+        "status": "passed",
+        "duration": 1121,
+        "timestamp": "2026-01-19T08:23:01.401Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/10-000-Enrollment-Filter-Applied-9cd337d3a3f82be0b6d511248e0ccb699f498b1c.png"
+      },
+      {
+        "name": "Validate all courses have at least 10,000 enrollments",
+        "status": "passed",
+        "duration": 669,
+        "timestamp": "2026-01-19T08:23:01.404Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/All-Courses-Meet-10-000-Enrollment-Threshold-9dd4a18b39da1f6bf636ed56b1ddd6345fb66455.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC2",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses",
+    "description": "TC2: Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses",
+    "status": "passed",
+    "duration": 13020,
+    "timestamp": "2026-01-19T08:23:01.766Z",
+    "steps": [
+      {
+        "name": "Navigate to the practice test table and verify page load",
+        "status": "passed",
+        "duration": 828,
+        "timestamp": "2026-01-19T08:23:01.745Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Page-Navigation-Successful-2fedbe693d7cc43c1dc6900bf6e56c2b42c1e186.png"
+      },
+      {
+        "name": "Select Beginner level filter and verify checkbox state",
+        "status": "passed",
+        "duration": 873,
+        "timestamp": "2026-01-19T08:23:01.764Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Beginner-Level-Filter-Applied-f9e2176c80fe30943ca865681f07e9decc8ae58c.png"
+      },
+      {
+        "name": "Verify all displayed courses are at Beginner difficulty level",
+        "status": "passed",
+        "duration": 756,
+        "timestamp": "2026-01-19T08:23:01.765Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/All-Rows-Verified-as-Beginner-Level-e98af59e98be429ac1a1c90f0e688e0360c82759.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC10",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Table Structure - Verify table has correct column headers in expected order",
+    "description": "TC10: Table Structure - Verify table has correct column headers in expected order",
+    "status": "passed",
+    "duration": 3301,
+    "timestamp": "2026-01-19T08:23:04.360Z",
+    "steps": [
+      {
+        "name": "Extract and validate table column headers",
+        "status": "passed",
+        "duration": 786,
+        "timestamp": "2026-01-19T08:23:04.358Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Table-Headers-Match-Expected-Structure-e0a355c8127c76ab3b88fc5fea0b32ced66a9f18.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Data Integrity Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC9",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Link Validation - Verify course links contain valid HTTP/HTTPS URLs",
+    "description": "TC9: Link Validation - Verify course links contain valid HTTP/HTTPS URLs",
+    "status": "passed",
+    "duration": 3724,
+    "timestamp": "2026-01-19T08:23:04.600Z",
+    "steps": [
+      {
+        "name": "Extract course links and validate URL format",
+        "status": "passed",
+        "duration": 1123,
+        "timestamp": "2026-01-19T08:23:04.599Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Course-Links-Validated-29bfb825794dbbce524afeecbb1540bb173761a4.png"
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Data Integrity Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC14",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Intentional Failure - Filter produces unexpected results",
+    "description": "TC14: Intentional Failure - Filter produces unexpected results",
+    "status": "failed",
+    "duration": 3431,
+    "timestamp": "2026-01-19T08:23:04.819Z",
+    "steps": [
+      {
+        "name": "Apply Java filter",
+        "status": "passed",
+        "duration": 401,
+        "timestamp": "2026-01-19T08:23:04.816Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Java-Filter-Applied-24f41eb76646d48d8130f44c5769e94a86599090.png"
+      },
+      {
+        "name": "Assert all courses are Python (will fail)",
+        "status": "failed",
+        "duration": 584,
+        "timestamp": "2026-01-19T08:23:04.817Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Before-Assertion-9a41e509575abb0328bceebf8bb875f5051e27ac.png",
+        "error": {
+          "message": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m",
+          "stack": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"
+        }
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m",
+      "stack": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"
+    }
+  },
+  {
+    "testId": "TC11",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Intentional Failure - Expecting wrong course count",
+    "description": "TC11: Intentional Failure - Expecting wrong course count",
+    "status": "failed",
+    "duration": 3759,
+    "timestamp": "2026-01-19T08:23:04.946Z",
+    "steps": [
+      {
+        "name": "Navigate to page and count courses",
+        "status": "passed",
+        "duration": 406,
+        "timestamp": "2026-01-19T08:23:04.943Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Initial-State-719faaf04f291d38f6f9467d3283b104667d83ff.png"
+      },
+      {
+        "name": "Assert incorrect expected count (will fail)",
+        "status": "failed",
+        "duration": 655,
+        "timestamp": "2026-01-19T08:23:04.945Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Before-Assertion-b608cd17b36763d4f4cf211e9b7a1a1ab3497045.png",
+        "error": {
+          "message": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m",
+          "stack": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"
+        }
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m",
+      "stack": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"
+    }
+  },
+  {
+    "testId": "TC12",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Intentional Failure - Invalid element selector",
+    "description": "TC12: Intentional Failure - Invalid element selector",
+    "status": "failed",
+    "duration": 6118,
+    "timestamp": "2026-01-19T08:23:07.305Z",
+    "steps": [
+      {
+        "name": "Try to find non-existent element",
+        "status": "passed",
+        "duration": 337,
+        "timestamp": "2026-01-19T08:23:07.303Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Page-State-a97b3c7fe62cc374bf7c06b6f89c3571ed9383fc.png"
+      },
+      {
+        "name": "Click on element that does not exist (will timeout)",
+        "status": "failed",
+        "duration": 3365,
+        "timestamp": "2026-01-19T08:23:07.304Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Before-Click-Attempt-2af70dfcd328788ca11d2b5aa7c1cc1971d0a5a2.png",
+        "error": {
+          "message": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n",
+          "stack": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"
+        }
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n",
+      "stack": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"
+    }
+  },
+  {
+    "testId": "TC13",
+    "runId": "RUN-2026-01-19T08-22-46",
+    "testName": "Intentional Failure - Wrong text assertion",
+    "description": "TC13: Intentional Failure - Wrong text assertion",
+    "status": "failed",
+    "duration": 6153,
+    "timestamp": "2026-01-19T08:23:07.483Z",
+    "steps": [
+      {
+        "name": "Check page heading",
+        "status": "passed",
+        "duration": 411,
+        "timestamp": "2026-01-19T08:23:07.481Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Heading-Check-7143da373384d7ea5963240957c2e8409b09fd57.png"
+      },
+      {
+        "name": "Assert wrong heading text (will fail)",
+        "status": "failed",
+        "duration": 3371,
+        "timestamp": "2026-01-19T08:23:07.482Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-22-46/Before-Text-Assertion-d37573a0f884469576fb8facb1ce323584e5c89b.png",
+        "error": {
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"
+        }
+      }
+    ],
+    "executionMode": "test:parallel",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n",
+      "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"
+    }
+  },
+  {
+    "testId": "TC1",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Filter by Programming Language - Verify that selecting Java language filter displays only Java courses",
+    "description": "TC1: Filter by Programming Language - Verify that selecting Java language filter displays only Java courses",
+    "status": "passed",
+    "duration": 4087,
+    "timestamp": "2026-01-19T08:23:20.626Z",
+    "steps": [
+      {
+        "name": "Navigate to page and verify initial table visibility",
+        "status": "passed",
+        "duration": 610,
+        "timestamp": "2026-01-19T08:23:20.622Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Page-Navigation-Complete-f4dce5ca8268c5f779295164576bf2bb32480087.png"
+      },
+      {
+        "name": "Apply Java language filter using the radio button selector",
+        "status": "passed",
+        "duration": 224,
+        "timestamp": "2026-01-19T08:23:20.624Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Java-Filter-Applied-86ed61b14a13c78f757d7af3f69f78b05c89dc3e.png"
+      },
+      {
+        "name": "Validate that all visible table rows contain only Java courses",
+        "status": "passed",
+        "duration": 319,
+        "timestamp": "2026-01-19T08:23:20.625Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/All-Rows-Verified-as-Java-Courses-9e8c458e7813ed52a38bef7735fb3f246109b454.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC2",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses",
+    "description": "TC2: Filter by Difficulty Level - Verify that selecting Beginner level displays only beginner courses",
+    "status": "passed",
+    "duration": 3794,
+    "timestamp": "2026-01-19T08:23:24.438Z",
+    "steps": [
+      {
+        "name": "Navigate to the practice test table and verify page load",
+        "status": "passed",
+        "duration": 637,
+        "timestamp": "2026-01-19T08:23:24.434Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Page-Navigation-Successful-24bd3f62c9f01486788514d535d4f56f84736fba.png"
+      },
+      {
+        "name": "Select Beginner level filter and verify checkbox state",
+        "status": "passed",
+        "duration": 486,
+        "timestamp": "2026-01-19T08:23:24.436Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Beginner-Level-Filter-Applied-b58052fea05742e8bc17011b6a1eaee1d6a4b3ee.png"
+      },
+      {
+        "name": "Verify all displayed courses are at Beginner difficulty level",
+        "status": "passed",
+        "duration": 259,
+        "timestamp": "2026-01-19T08:23:24.437Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/All-Rows-Verified-as-Beginner-Level-b6ae4ca7dad1ae99c85534c250b6e50247aa4a7b.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC3",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment",
+    "description": "TC3: Filter by Minimum Enrollments - Verify that 10,000+ filter shows only courses with high enrollment",
+    "status": "passed",
+    "duration": 3594,
+    "timestamp": "2026-01-19T08:23:28.049Z",
+    "steps": [
+      {
+        "name": "Navigate to page and apply minimum enrollment filter of 10,000+",
+        "status": "passed",
+        "duration": 816,
+        "timestamp": "2026-01-19T08:23:28.047Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/10-000-Enrollment-Filter-Applied-0339988c150e0251da2b9fa9b8215f6b69080a85.png"
+      },
+      {
+        "name": "Validate all courses have at least 10,000 enrollments",
+        "status": "passed",
+        "duration": 262,
+        "timestamp": "2026-01-19T08:23:28.048Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/All-Courses-Meet-10-000-Enrollment-Threshold-fabd39169ef73398eb43835ef5f82596117a7cff.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC4",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)",
+    "description": "TC4: Combined Filters - Verify multiple filters work together (Python + Beginner + 10,000+ enrollments)",
+    "status": "passed",
+    "duration": 3776,
+    "timestamp": "2026-01-19T08:23:31.844Z",
+    "steps": [
+      {
+        "name": "Apply all three filters sequentially - Language, Level, and Enrollment",
+        "status": "passed",
+        "duration": 1081,
+        "timestamp": "2026-01-19T08:23:31.842Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/All-Three-Filters-Applied-Successfully-f59a67a2acc188c7ea709fe88a6ac0c6644e7099.png"
+      },
+      {
+        "name": "Validate all rows satisfy all three filter conditions simultaneously",
+        "status": "passed",
+        "duration": 226,
+        "timestamp": "2026-01-19T08:23:31.843Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/All-Rows-Meet-Combined-Filter-Criteria-67f5d59f260d73b8f15d2adc6f6e468cd663cd1c.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Filter Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC5",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Empty State - Verify \"No courses found\" message appears when filters return zero results",
+    "description": "TC5: Empty State - Verify \"No courses found\" message appears when filters return zero results",
+    "status": "passed",
+    "duration": 3725,
+    "timestamp": "2026-01-19T08:23:35.585Z",
+    "steps": [
+      {
+        "name": "Navigate to page and uncheck all level filters to create empty state",
+        "status": "passed",
+        "duration": 949,
+        "timestamp": "2026-01-19T08:23:35.583Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/All-Level-Filters-Unchecked-b7425b3b65d3f7666aac4df43849db5e12d283da.png"
+      },
+      {
+        "name": "Verify the \"No courses match\" message is displayed to the user",
+        "status": "passed",
+        "duration": 184,
+        "timestamp": "2026-01-19T08:23:35.584Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/No-Results-Message-Displayed-cf83b171d81c2bfa3a98bdced04c5c209e0851dd.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "UI State Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC6",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Reset Functionality - Verify Reset button clears all filters and restores default state",
+    "description": "TC6: Reset Functionality - Verify Reset button clears all filters and restores default state",
+    "status": "passed",
+    "duration": 3250,
+    "timestamp": "2026-01-19T08:23:38.851Z",
+    "steps": [
+      {
+        "name": "Apply a filter and verify the Reset button becomes visible",
+        "status": "passed",
+        "duration": 585,
+        "timestamp": "2026-01-19T08:23:38.849Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Filter-Applied---Reset-Button-Visible-f5bf67343a3b0f18248811e08a175c42802fe74c.png"
+      },
+      {
+        "name": "Click Reset button and verify filters are cleared and button is hidden",
+        "status": "passed",
+        "duration": 239,
+        "timestamp": "2026-01-19T08:23:38.850Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Reset-Complete---Default-State-Restored-04d07f9ef9d3e56cdfde6a48c289c7384f090623.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "UI State Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC7",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Numeric Sorting - Verify table sorts by Enrollments column in ascending order",
+    "description": "TC7: Numeric Sorting - Verify table sorts by Enrollments column in ascending order",
+    "status": "passed",
+    "duration": 3486,
+    "timestamp": "2026-01-19T08:23:42.355Z",
+    "steps": [
+      {
+        "name": "Navigate to page and trigger sort by Enrollments column",
+        "status": "passed",
+        "duration": 611,
+        "timestamp": "2026-01-19T08:23:42.353Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Sort-by-Enrollments-Selected-b4bd5742ce24893b2321bb5d03be7f15299fcd34.png"
+      },
+      {
+        "name": "Validate enrollment values are in ascending numerical order",
+        "status": "passed",
+        "duration": 354,
+        "timestamp": "2026-01-19T08:23:42.354Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Ascending-Order-Verified-3b07e38e42b373635d832299ef7826ad850c0d09.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Sorting Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC8",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order",
+    "description": "TC8: Alphabetical Sorting - Verify table sorts by Course Name column in A-Z order",
+    "status": "passed",
+    "duration": 3828,
+    "timestamp": "2026-01-19T08:23:46.200Z",
+    "steps": [
+      {
+        "name": "Navigate to page and trigger sort by Course Name column",
+        "status": "passed",
+        "duration": 1072,
+        "timestamp": "2026-01-19T08:23:46.197Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Sort-by-Course-Name-Selected-ec1f82ec10f3b0ff6796d52d5077aedf5c39ceb4.png"
+      },
+      {
+        "name": "Validate course names are in alphabetical ascending order",
+        "status": "passed",
+        "duration": 377,
+        "timestamp": "2026-01-19T08:23:46.199Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Alphabetical-Order-Verified-f60e0bd05e10ace27151133b68264797e08bd3e0.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Sorting Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC9",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Link Validation - Verify course links contain valid HTTP/HTTPS URLs",
+    "description": "TC9: Link Validation - Verify course links contain valid HTTP/HTTPS URLs",
+    "status": "passed",
+    "duration": 3184,
+    "timestamp": "2026-01-19T08:23:49.407Z",
+    "steps": [
+      {
+        "name": "Extract course links and validate URL format",
+        "status": "passed",
+        "duration": 723,
+        "timestamp": "2026-01-19T08:23:49.406Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Course-Links-Validated-d737f721c8cf523634c51e6b34cb1833fe6d2ced.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Data Integrity Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC10",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Table Structure - Verify table has correct column headers in expected order",
+    "description": "TC10: Table Structure - Verify table has correct column headers in expected order",
+    "status": "passed",
+    "duration": 3177,
+    "timestamp": "2026-01-19T08:23:52.601Z",
+    "steps": [
+      {
+        "name": "Extract and validate table column headers",
+        "status": "passed",
+        "duration": 579,
+        "timestamp": "2026-01-19T08:23:52.599Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Table-Headers-Match-Expected-Structure-ae795b485478ed6050ba687016796c64c8eb56a0.png"
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Data Integrity Tests",
+    "retryCount": 0
+  },
+  {
+    "testId": "TC11",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Intentional Failure - Expecting wrong course count",
+    "description": "TC11: Intentional Failure - Expecting wrong course count",
+    "status": "failed",
+    "duration": 2804,
+    "timestamp": "2026-01-19T08:23:55.473Z",
+    "steps": [
+      {
+        "name": "Navigate to page and count courses",
+        "status": "passed",
+        "duration": 206,
+        "timestamp": "2026-01-19T08:23:55.472Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Initial-State-972746e95a2b1dc2d148740f050bfdf3904a279a.png"
+      },
+      {
+        "name": "Assert incorrect expected count (will fail)",
+        "status": "failed",
+        "duration": 308,
+        "timestamp": "2026-01-19T08:23:55.473Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Before-Assertion-858058ce2b5486597fe291f04ce5b42ebd7ac975.png",
+        "error": {
+          "message": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m",
+          "stack": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"
+        }
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m",
+      "stack": "Error: Expected 999 courses but found fewer\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m999\u001b[39m\nReceived: \u001b[31m9\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:27:67\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:22:5"
+    }
+  },
+  {
+    "testId": "TC12",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Intentional Failure - Invalid element selector",
+    "description": "TC12: Intentional Failure - Invalid element selector",
+    "status": "failed",
+    "duration": 5636,
+    "timestamp": "2026-01-19T08:24:02.262Z",
+    "steps": [
+      {
+        "name": "Try to find non-existent element",
+        "status": "passed",
+        "duration": 231,
+        "timestamp": "2026-01-19T08:24:02.261Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Page-State-71454bd5f9076fdcd388ec8b7995c47c4e3deb75.png"
+      },
+      {
+        "name": "Click on element that does not exist (will timeout)",
+        "status": "failed",
+        "duration": 3231,
+        "timestamp": "2026-01-19T08:24:02.262Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Before-Click-Attempt-28b77343d4ba2b930c4257a1b2e86bc4d0514931.png",
+        "error": {
+          "message": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n",
+          "stack": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"
+        }
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n",
+      "stack": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#non-existent-element-12345')\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:42:72\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:37:5"
+    }
+  },
+  {
+    "testId": "TC13",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Intentional Failure - Wrong text assertion",
+    "description": "TC13: Intentional Failure - Wrong text assertion",
+    "status": "failed",
+    "duration": 5662,
+    "timestamp": "2026-01-19T08:24:09.012Z",
+    "steps": [
+      {
+        "name": "Check page heading",
+        "status": "passed",
+        "duration": 215,
+        "timestamp": "2026-01-19T08:24:09.009Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Heading-Check-6f5e4f6542663eca4706d9ff4121bd1ee204d881.png"
+      },
+      {
+        "name": "Assert wrong heading text (will fail)",
+        "status": "failed",
+        "duration": 3230,
+        "timestamp": "2026-01-19T08:24:09.010Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Before-Text-Assertion-8f9fa4d2095b8c8933f18a3153c822785a6061a2.png",
+        "error": {
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"
+        }
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n",
+      "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('h1')\nExpected: \u001b[32m\"T\u001b[7mhis Is Wrong Text That Does Not Exist\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"T\u001b[7mest Table\u001b[27m\"\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    7 × locator resolved to <h1 class=\"post-title\">Test Table</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Test Table\"\u001b[22m\n\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:57:55\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:52:5"
+    }
+  },
+  {
+    "testId": "TC14",
+    "runId": "RUN-2026-01-19T08-23-15",
+    "testName": "Intentional Failure - Filter produces unexpected results",
+    "description": "TC14: Intentional Failure - Filter produces unexpected results",
+    "status": "failed",
+    "duration": 2921,
+    "timestamp": "2026-01-19T08:24:13.037Z",
+    "steps": [
+      {
+        "name": "Apply Java filter",
+        "status": "passed",
+        "duration": 237,
+        "timestamp": "2026-01-19T08:24:13.035Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Java-Filter-Applied-d4849e8531b1f3f8083eb8c41628c1c70ba1f1f8.png"
+      },
+      {
+        "name": "Assert all courses are Python (will fail)",
+        "status": "failed",
+        "duration": 316,
+        "timestamp": "2026-01-19T08:24:13.036Z",
+        "screenshot": "screenshots/RUN-2026-01-19T08-23-15/Before-Assertion-e433787f13230fc5c2cb2dadc72d11da8c44b03c.png",
+        "error": {
+          "message": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m",
+          "stack": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"
+        }
+      }
+    ],
+    "executionMode": "test:sequential",
+    "browser": "chromium",
+    "category": "Other",
+    "retryCount": 0,
+    "error": {
+      "message": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m",
+      "stack": "Error: Expected Python but found Java\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Python\"\u001b[39m\nReceived: \u001b[31m\"Java\"\u001b[39m\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:76:75\n    at C:\\Users\\karti\\OneDrive\\Desktop\\Assignment checkmate\\tests\\failing.spec.ts:70:5"
+    }
+  }
+]
